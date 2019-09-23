@@ -1,0 +1,16 @@
+image:
+  repository: ${HELM_BFF_IMAGE_REPOSITORY}
+  tag: ${HELM_BFF_IMAGE_TAG}
+
+nameOverride: "console-${PROJECT_UUID}-bff"
+fullnameOverride: ""
+
+fqdns:
+  - ${HELM_BFF_FQDN}
+
+service:
+  port: 4000
+
+ingress:
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: ${HELM_BFF_STATIC_IP_NAME}

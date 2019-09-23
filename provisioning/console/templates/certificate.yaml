@@ -1,0 +1,9 @@
+apiVersion: networking.gke.io/v1beta1
+kind: ManagedCertificate
+metadata:
+  name: {{ include "console.fullname" . }}-frontend
+spec:
+  domains:
+  {{- range .Values.fqdns }}
+    - {{ . }}
+  {{- end }}

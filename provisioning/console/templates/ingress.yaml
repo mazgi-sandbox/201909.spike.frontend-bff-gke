@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "console.fullname" . }}-ingress
+  labels:
+{{ include "console.labels" . | indent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+    networking.gke.io/managed-certificates: {{ include "console.fullname" . }}-frontend
+spec:
+  backend:
+    serviceName: {{ include "console.fullname" . }}-frontend
+    servicePort: {{ .Values.service.port }}

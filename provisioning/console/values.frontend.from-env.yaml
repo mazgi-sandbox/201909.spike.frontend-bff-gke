@@ -1,0 +1,16 @@
+image:
+  repository: ${HELM_FRONTEND_IMAGE_REPOSITORY}
+  tag: ${HELM_FRONTEND_IMAGE_TAG}
+
+nameOverride: "console-${PROJECT_UUID}-frontend"
+fullnameOverride: ""
+
+fqdns:
+  - ${HELM_FRONTEND_FQDN}
+
+service:
+  port: 3000
+
+ingress:
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: ${HELM_FRONTEND_STATIC_IP_NAME}

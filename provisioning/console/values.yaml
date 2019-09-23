@@ -1,0 +1,21 @@
+replicaCount: 3
+
+image:
+  repository: gcr.io/YOUR-GCP-PROJECT/YOUR-IMAGE
+  tag: latest
+  pullPolicy: Always
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+fqdns:
+  - console.example.com
+
+service:
+  type: NodePort
+  port: 3000
+
+ingress:
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: console-static-ip-name

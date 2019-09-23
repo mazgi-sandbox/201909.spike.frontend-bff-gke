@@ -1,0 +1,77 @@
+version: "3.7"
+services:
+  vscode: # for prettier
+    image: node:10
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    user: "${UID:-0}:${GID:-0}"
+    command: >
+      bash -c
+      "npm install"
+  provisioning:
+    build:
+      context: Dockerfile.d/provisioning
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      # - /var/run/docker.sock:/var/run/docker.sock
+    user: "${UID:-0}:${GID:-0}"
+    environment:
+      - PROJECT_UUID
+      - GOOGLE_APPLICATION_CREDENTIALS=/workspace/credentials/${GOOGLE_APPLICATION_CREDENTIALS_FILENAME}
+    command: >
+      bash -c
+      "direnv allow
+      && gcloud auth configure-docker
+      && cd /workspace/provisioning/domain
+      && terraform init -backend-config=\"bucket=${PROJECT_UUID}\"
+      && cd /workspace/provisioning/gke
+      && terraform init -backend-config=\"bucket=${PROJECT_UUID}\""
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+    ports:
+      - "${BIND_IP_ADDR:-127.0.0.1}:3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+  frontend:
+    build:
+      context: Dockerfile.d/frontend
+      target: development
+    working_dir: /workspace
+    volumes:
+      - ./frontend:/workspace
+      - ${SSH_AUTH_SOCK}:${SSH_AUTH_SOCK}
+    ports:
+      - "${BIND_IP_ADDR:-127.0.0.1}:3000:3000"
+    user: "${UID:-0}:${GID:-0}"
+    environment:
+      - SSH_AUTH_SOCK
+      - BFF_ENDPOINT_GRAPHQL=http://${BIND_IP_ADDR:-127.0.0.1}:4000/graphql
+    command: >
+      bash -c
+      "npm install
+      && npm run dev"
+  bff:
+    build:
+      context: Dockerfile.d/bff
+      target: development
+    working_dir: /workspace
+    volumes:
+      - ./bff:/workspace
+      - ${SSH_AUTH_SOCK}:${SSH_AUTH_SOCK}
+    ports:
+      - "${BIND_IP_ADDR:-127.0.0.1}:4000:4000"
+    user: "${UID:-0}:${GID:-0}"
+    environment:
+      - SSH_AUTH_SOCK
+      - PORT=4000
+    command: >
+      bash -c
+      "npm install
+      && npm run dev"
+volumes:
+  mysql-data:
+    driver: local
