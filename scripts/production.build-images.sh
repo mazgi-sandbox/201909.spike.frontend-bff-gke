@@ -46,4 +46,5 @@ do
     echo "export HELM_${SV}_IMAGE_REPOSITORY=\"${DOCKER_REPOSITORY}\"" | tee -a "${HELM_ENV_FILE_PATH}"
     echo "export HELM_${SV}_IMAGE_TAG=\"${DOCKER_TAG}\"" | tee -a "${HELM_ENV_FILE_PATH}"
   fi
+  git checkout ${DOCKER_CONTEXT_DIR}/source
 done

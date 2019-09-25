@@ -1,7 +1,7 @@
 import App from 'next/app'
+import { Provider } from 'react-redux'
 import React from 'react'
 import withReduxStore from 'lib/redux/with-redux-store'
-import { Provider } from 'react-redux'
 
 class MyApp extends App {
   render() {

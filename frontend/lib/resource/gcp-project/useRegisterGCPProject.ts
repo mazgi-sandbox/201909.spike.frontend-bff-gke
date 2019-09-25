@@ -1,29 +1,28 @@
 import { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { actionTypes } from 'lib/redux/resource'
-import faker from 'faker'
 import getConfig from 'next/config'
 
 const { publicRuntimeConfig } = getConfig()
 const endpoint = publicRuntimeConfig.BFF_ENDPOINT_GRAPHQL
 
-const useCreateUser = () => {
+const useRegisterGCPProject = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const user = useSelector(state => state.resource.createUser)
+  const gcpProject = useSelector(state => state.resource.registerGCPProject)
   const dispatch = useDispatch()
-  const funcPutUser = async ({ name, displayName, email, password }) => {
+  const funcPutGCPProject = async ({ projectId, description }) => {
     const query = `
     mutation{
-      createUser(
-        name: "${name}",
-        displayName: "${displayName}",
-        email: "${email}"
+      registerGCPProject(
+        projectId: "${projectId}",
+        description: "${description}"
       ) {
         id
-        name
-        displayName
-        email
+        projectId
+        projectName
+        description
+        syncStatus
       }
     }
     `
@@ -42,12 +41,12 @@ const useCreateUser = () => {
       console.log(`response.status: ${response.status}, ${response.statusText}`)
       const result = await response.json()
       const data = result.data
-      const user = data.createUser
-      console.log(`createUser: ${JSON.stringify(user)}`)
+      const gcpProject = data.registerGCPProject
+      console.log(`registerGCPProject: ${JSON.stringify(gcpProject)}`)
       setLoading(false)
       dispatch({
-        type: actionTypes.CREATE_USER_SUCCESS,
-        createUser: user
+        type: actionTypes.REGISTER_GCP_PROJECT_SUCCESS,
+        registerGCPProject: gcpProject
       })
     } catch (e) {
       console.log(`err: ${e}`)
@@ -55,8 +54,12 @@ const useCreateUser = () => {
       setError(e.message)
     }
   }
-  const putUser = useCallback(funcPutUser, [loading, error, user])
-  return [user, putUser, loading, error]
+  const putGCPProject = useCallback(funcPutGCPProject, [
+    loading,
+    error,
+    gcpProject
+  ])
+  return [gcpProject, putGCPProject, loading, error]
 }
 
-export default useCreateUser
+export default useRegisterGCPProject

@@ -1,8 +1,10 @@
+import { GCPProjects, Users } from '../../molecules/SideMenuItemsMolecules'
 import { List } from '@material-ui/core'
-import { Users } from '../../molecules/SideMenuItemsMolecules'
+import React from 'react'
 
 const Component: React.FC = () => (
   <List>
+    <GCPProjects />
     <Users />
   </List>
 )

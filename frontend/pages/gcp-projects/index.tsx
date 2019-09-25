@@ -1,11 +1,11 @@
 import DefaultPageTemplate from 'components/templates/DefaultPageTemplate'
-import { Form } from 'components/organisms/UserCreateFormOrganism'
+import GCPProjectListOrganism from 'components/organisms/GCPProjectListOrganism'
 import React from 'react'
 
 const Page: () => JSX.Element = () => {
   return (
-    <DefaultPageTemplate title="Create a new user">
-      <Form />
+    <DefaultPageTemplate title="GCP Projects">
+      <GCPProjectListOrganism />
     </DefaultPageTemplate>
   )
 }

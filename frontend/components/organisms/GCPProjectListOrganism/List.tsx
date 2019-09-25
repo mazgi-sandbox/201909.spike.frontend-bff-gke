@@ -10,23 +10,18 @@ import {
 } from '@material-ui/core'
 import React, { useEffect } from 'react'
 import Router from 'next/router'
-import { useObjectStorages } from 'lib/resource/object-storage'
+import { useGCPProjects } from 'lib/resource/gcp-project'
 
 const Component: React.FC = () => {
-  const hrefNew = `/object-storages/new`
-  const [
-    objectStorages,
-    getObjectStorages,
-    loading,
-    error
-  ] = useObjectStorages()
-  const rows = objectStorages || []
+  const hrefNew = `/gcp-projects/new`
+  const [gcpProjects, getGCPProjects, loading, error] = useGCPProjects()
+  const rows = gcpProjects || []
 
   useEffect(() => {
-    getObjectStorages()
+    getGCPProjects()
   }, [])
 
-  console.log(`objectStorages: ${JSON.stringify(objectStorages)}`)
+  console.log(`gcpProjects: ${JSON.stringify(gcpProjects)}`)
 
   return (
     <Grid container spacing={3}>
@@ -36,7 +31,7 @@ const Component: React.FC = () => {
           color="primary"
           onClick={() => Router.push(hrefNew)}
         >
-          Create
+          Register
         </Button>
       </Grid>
       <Grid item xs={12}>
@@ -44,21 +39,17 @@ const Component: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
+                <TableCell>Project Name</TableCell>
                 <TableCell>Description</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Location</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map(objectStorage => (
-                <TableRow key={objectStorage.id}>
+              {rows.map(entity => (
+                <TableRow key={entity.id}>
                   <TableCell component="th" scope="row">
-                    {objectStorage.name}
+                    {entity.projectName}
                   </TableCell>
-                  <TableCell>{objectStorage.description}</TableCell>
-                  <TableCell>{objectStorage.type}</TableCell>
-                  <TableCell>{objectStorage.location}</TableCell>
+                  <TableCell>{entity.description}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

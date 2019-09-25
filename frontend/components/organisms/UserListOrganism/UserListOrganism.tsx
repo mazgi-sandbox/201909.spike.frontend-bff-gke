@@ -1,100 +1,64 @@
 import {
-  Add,
-  AddBox,
-  ArrowUpward,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Clear,
-  Delete,
-  DeleteOutline,
-  Edit,
-  FilterList,
-  FirstPage,
-  LastPage,
-  Remove,
-  SaveAlt,
-  Search,
-  ViewColumn
-} from '@material-ui/icons'
-import React, { forwardRef, useEffect } from 'react'
-import MaterialTable from 'material-table'
+  Button,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow
+} from '@material-ui/core'
+import React, { useEffect } from 'react'
 import Router from 'next/router'
 import { useUsers } from 'lib/resource/user'
 
 const Component: React.FC = () => {
+  const hrefNew = `/users/new`
   const [users, getUsers, loading, error] = useUsers()
 
   useEffect(() => {
     getUsers()
   }, [])
+  const rows = users || []
+
+  console.log(`users: ${JSON.stringify(users)}`)
 
   return (
-    <MaterialTable
-      icons={{
-        Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
-        Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
-        Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-        Delete: forwardRef((props, ref) => (
-          <DeleteOutline {...props} ref={ref} />
-        )),
-        DetailPanel: forwardRef((props, ref) => (
-          <ChevronRight {...props} ref={ref} />
-        )),
-        Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
-        Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
-        Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
-        FirstPage: forwardRef((props, ref) => (
-          <FirstPage {...props} ref={ref} />
-        )),
-        LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
-        NextPage: forwardRef((props, ref) => (
-          <ChevronRight {...props} ref={ref} />
-        )),
-        PreviousPage: forwardRef((props, ref) => (
-          <ChevronLeft {...props} ref={ref} />
-        )),
-        ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-        Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
-        SortArrow: forwardRef((props, ref) => (
-          <ArrowUpward {...props} ref={ref} />
-        )),
-        ThirdStateCheck: forwardRef((props, ref) => (
-          <Remove {...props} ref={ref} />
-        )),
-        ViewColumn: forwardRef((props, ref) => (
-          <ViewColumn {...props} ref={ref} />
-        ))
-      }}
-      title="all users"
-      columns={[
-        { title: 'Name', field: 'name'},
-        { title: 'Display Name', field: 'displayName'},
-        { title: 'Email', field: 'email' },
-      ]}
-      data={users}
-      options={{
-        filtering: true
-      }}
-      actions={[
-        {
-          icon: (): React.ReactElement => <Edit />,
-          tooltip: 'Edit user',
-          onClick: (event, row) => alert('You can edit ' + row['email'])
-        },
-        {
-          icon: (): React.ReactElement => <Delete />,
-          tooltip: 'Delete User',
-          onClick: (event, row) => alert('You can delete ' + row['email'])
-        },
-        {
-          icon: (): React.ReactElement => <Add />,
-          tooltip: 'Create new user',
-          isFreeAction: true,
-          onClick: event => Router.push('/users/new')
-        }
-      ]}
-    />
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => Router.push(hrefNew)}
+        >
+          Create
+        </Button>
+      </Grid>
+      <Grid item xs={12}>
+        <Paper>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Display Name</TableCell>
+                <TableCell>Email</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map(user => (
+                <TableRow key={user.id}>
+                  <TableCell component="th" scope="row">
+                    {user.name}
+                  </TableCell>
+                  <TableCell>{user.displayName}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      </Grid>
+    </Grid>
   )
 }
 

@@ -15,6 +15,17 @@ ENV DEBIAN_FRONTEND=
 
 
 # ================================
+# Begin development stage
+FROM base as development
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+  && apt-get install --assume-yes --no-install-recommends git tmux zsh jq
+ENV DEBIAN_FRONTEND=
+# End development stage
+# ================================
+
+
+# ================================
 # Begin production stage
 FROM base as production
 ENV DEBIAN_FRONTEND=noninteractive
@@ -24,15 +35,4 @@ RUN npm install \
   && npm run build
 CMD ["npm", "run", "start"]
 # End production stage
-# ================================
-
-
-# ================================
-# Begin development stage
-FROM base as development
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update \
-  && apt-get install --assume-yes --no-install-recommends git tmux zsh jq
-ENV DEBIAN_FRONTEND=
-# End development stage
 # ================================
