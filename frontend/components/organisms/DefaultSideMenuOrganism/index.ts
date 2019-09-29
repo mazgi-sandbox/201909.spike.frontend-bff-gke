@@ -1,1 +1,1 @@
-export { default } from './DefaultSideMenuOrganism'
+export { default } from './Menu'

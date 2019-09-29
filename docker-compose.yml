@@ -9,25 +9,25 @@ services:
     command: >
       bash -c
       "npm install"
-  provisioning:
-    build:
-      context: Dockerfile.d/provisioning
-    working_dir: /workspace
-    volumes:
-      - .:/workspace
-      # - /var/run/docker.sock:/var/run/docker.sock
-    user: "${UID:-0}:${GID:-0}"
-    environment:
-      - PROJECT_UUID
-      - GOOGLE_APPLICATION_CREDENTIALS=/workspace/credentials/${GOOGLE_APPLICATION_CREDENTIALS_FILENAME}
-    command: >
-      bash -c
-      "direnv allow
-      && gcloud auth configure-docker
-      && cd /workspace/provisioning/domain
-      && terraform init -backend-config=\"bucket=${PROJECT_UUID}\"
-      && cd /workspace/provisioning/gke
-      && terraform init -backend-config=\"bucket=${PROJECT_UUID}\""
+  # provisioning:
+  #   build:
+  #     context: Dockerfile.d/provisioning
+  #   working_dir: /workspace
+  #   volumes:
+  #     - .:/workspace
+  #     # - /var/run/docker.sock:/var/run/docker.sock
+  #   user: "${UID:-0}:${GID:-0}"
+  #   environment:
+  #     - PROJECT_UUID
+  #     - GOOGLE_APPLICATION_CREDENTIALS=/workspace/credentials/${GOOGLE_APPLICATION_CREDENTIALS_FILENAME}
+  #   command: >
+  #     bash -c
+  #     "direnv allow
+  #     && gcloud auth configure-docker
+  #     && cd /workspace/provisioning/domain
+  #     && terraform init -backend-config=\"bucket=${PROJECT_UUID}\"
+  #     && cd /workspace/provisioning/gke
+  #     && terraform init -backend-config=\"bucket=${PROJECT_UUID}\""
   mysql:
     image: mysql:5.7
     environment:

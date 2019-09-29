@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import cors from 'cors'
 import express from 'express'
 import graphqlHTTP from 'express-graphql'
@@ -14,7 +15,6 @@ if (isDev) {
   app.use(logger('dev'))
 }
 app.use(cors())
-
 app.use(
   '/graphql',
   graphqlHTTP({

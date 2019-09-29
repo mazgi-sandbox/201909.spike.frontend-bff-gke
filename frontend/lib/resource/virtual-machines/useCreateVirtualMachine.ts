@@ -6,23 +6,32 @@ import getConfig from 'next/config'
 const { publicRuntimeConfig } = getConfig()
 const endpoint = publicRuntimeConfig.BFF_ENDPOINT_GRAPHQL
 
-const useRegisterGCPProject = () => {
+const useCreateVirtualMachine = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const gcpProject = useSelector(state => state.resource.registerGCPProject)
+  const virtualMachine = useSelector(
+    state => state.resource.createVirtualMachine
+  )
   const dispatch = useDispatch()
-  const funcPutGCPProject = async ({ projectId, description }) => {
+  const funcPutVirtualMachine = async ({
+    type,
+    location,
+    name,
+    description
+  }) => {
     const query = `
     mutation{
-      registerGCPProject(
-        projectId: "${projectId}",
+      createVirtualMachine(
+        type: "${type}",
+        location: "${location}",
+        name: "${name}",
         description: "${description}"
       ) {
         id
-        projectId
-        projectName
+        type
+        location
+        name
         description
-        syncStatus
       }
     }
     `
@@ -41,12 +50,13 @@ const useRegisterGCPProject = () => {
       console.log(`response.status: ${response.status}, ${response.statusText}`)
       const result = await response.json()
       const data = result.data
-      const gcpProject = data.registerGCPProject
-      console.log(`registerGCPProject: ${JSON.stringify(gcpProject)}`)
+      console.log(`data: ${JSON.stringify(data)}`)
+      const virtualMachine = data.createVirtualMachine
+      console.log(`createVirtualMachine: ${JSON.stringify(virtualMachine)}`)
       setLoading(false)
       dispatch({
-        type: actionTypes.REGISTER_GCP_PROJECT_SUCCESS,
-        registerGCPProject: gcpProject
+        type: actionTypes.CREATE_VIRTUAL_MACHINE_SUCCESS,
+        useCreateVirtualMachine: virtualMachine
       })
     } catch (e) {
       console.log(`err: ${e}`)
@@ -54,12 +64,12 @@ const useRegisterGCPProject = () => {
       setError(e.message)
     }
   }
-  const putGCPProject = useCallback(funcPutGCPProject, [
+  const putVirtualMachine = useCallback(funcPutVirtualMachine, [
     loading,
     error,
-    gcpProject
+    virtualMachine
   ])
-  return [gcpProject, putGCPProject, loading, error]
+  return [virtualMachine, putVirtualMachine, loading, error]
 }
 
-export default useRegisterGCPProject
+export default useCreateVirtualMachine

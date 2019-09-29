@@ -1,1 +1,1 @@
-export { default } from './SettingMenuListOrganism'
+export { default } from './List'

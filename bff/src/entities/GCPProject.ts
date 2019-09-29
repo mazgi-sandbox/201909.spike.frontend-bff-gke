@@ -8,10 +8,10 @@ export enum GCPProjectSyncStatus {
   PLATFORM_ERRORED = 1 << 6
 }
 
-@Entity('gcp_projects')
+@Entity()
 export class GCPProject extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   @Column()
   projectId: string

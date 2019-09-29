@@ -1,4 +1,3 @@
-const TypeOrmNamingStrategy = require('./TypeOrmNamingStrategy')
 module.exports = {
   type: 'mysql',
   host: 'mysql',
@@ -15,6 +14,5 @@ module.exports = {
     migrationsDir: 'src/db/migrations',
     subscribersDir: 'src/db/subscribers'
   },
-  logging: true,
-  namingStrategy: new TypeOrmNamingStrategy()
+  logging: true
 }

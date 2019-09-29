@@ -10,28 +10,43 @@ import {
 } from '@material-ui/core'
 import React, { useEffect } from 'react'
 import Router from 'next/router'
-import { useGCPProjects } from 'lib/resource/gcp-project'
+import { actionTypes } from 'lib/redux/resource'
+import { useGraphQLRequest } from 'lib/util/request'
+import { useSelector } from 'react-redux'
 
 const Component: React.FC = () => {
   const hrefNew = `/gcp-projects/new`
-  const [gcpProjects, getGCPProjects, loading, error] = useGCPProjects()
+  const query = `
+    query{
+      gcpProjects {
+        id
+        projectId
+        projectName
+        description
+        syncStatus
+      }
+    }
+    `
+  const gcpProjects = useSelector(state => state.resource.gcpProjects)
   const rows = gcpProjects || []
+  const [funcFetchGraphQL, loading, errors] = useGraphQLRequest()
 
   useEffect(() => {
-    getGCPProjects()
+    funcFetchGraphQL(query, actionTypes.GCP_PROJECTS_SUCCESS, 'gcpProjects')
   }, [])
-
-  console.log(`gcpProjects: ${JSON.stringify(gcpProjects)}`)
 
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
+        <Button color="primary" onClick={() => Router.push(hrefNew)}>
+          Register
+        </Button>
         <Button
-          variant="contained"
           color="primary"
           onClick={() => Router.push(hrefNew)}
+          disabled={false}
         >
-          Register
+          Un-Register
         </Button>
       </Grid>
       <Grid item xs={12}>
@@ -44,12 +59,12 @@ const Component: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map(entity => (
-                <TableRow key={entity.id}>
+              {rows.map(gcpProject => (
+                <TableRow key={gcpProject.id}>
                   <TableCell component="th" scope="row">
-                    {entity.projectName}
+                    {gcpProject.projectName}
                   </TableCell>
-                  <TableCell>{entity.description}</TableCell>
+                  <TableCell>{gcpProject.description}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

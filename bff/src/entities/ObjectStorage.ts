@@ -14,10 +14,10 @@ export enum ObjectStorageSyncStatus {
   PLATFORM_ERRORED = 1 << 6
 }
 
-@Entity('object_storages')
+@Entity()
 export class ObjectStorage extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   @Column({
     type: 'enum',

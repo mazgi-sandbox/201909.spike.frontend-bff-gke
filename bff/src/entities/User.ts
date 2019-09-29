@@ -1,9 +1,9 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity('users')
+@Entity()
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   @Column({
     type: 'varchar',
@@ -26,6 +26,8 @@ export class User extends BaseEntity {
     unique: true
   })
   email: string
+
+  token: string
 }
 
 export default User

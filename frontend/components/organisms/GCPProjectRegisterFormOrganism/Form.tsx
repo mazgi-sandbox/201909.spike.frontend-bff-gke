@@ -6,10 +6,14 @@ import {
   Theme,
   makeStyles
 } from '@material-ui/core'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { actionTypes } from 'lib/redux/resource'
 import faker from 'faker'
+import { generateMessage } from 'components/molecules/SnackbarMolecules'
+import { notificationEnqueueMessage } from 'lib/redux/ui'
+import { useDispatch } from 'react-redux'
 import useForm from 'react-hook-form'
-import { useRegisterGCPProject } from 'lib/resource/gcp-project'
+import { useGraphQLRequest } from 'lib/util/request'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -21,12 +25,37 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 const Component = () => {
+  const dispatch = useDispatch()
   const classes = useStyles('')
   const { register, handleSubmit, watch, errors } = useForm()
-  const [gcpProject, putGCPProject, loading, error] = useRegisterGCPProject()
+  const [funcFetchGraphQL, loading, fetchErrors] = useGraphQLRequest()
+  useEffect(() => {
+    fetchErrors.forEach(err => {
+      const message = generateMessage(err.message)
+      dispatch(notificationEnqueueMessage(message))
+    })
+  }, fetchErrors)
   const onSubmit = data => {
     console.log(`register a GCP project: ${JSON.stringify(data)}`)
-    putGCPProject(data)
+    const query = `
+    mutation{
+      registerGCPProject(
+        projectId: "${data.projectId}",
+        description: "${data.description}"
+      ) {
+        id
+        projectId
+        projectName
+        description
+        syncStatus
+      }
+    }
+    `
+    funcFetchGraphQL(
+      query,
+      actionTypes.REGISTER_GCP_PROJECT_SUCCESS,
+      'registerGCPProject'
+    )
   }
 
   return (

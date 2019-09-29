@@ -10,23 +10,38 @@ import {
 } from '@material-ui/core'
 import React, { useEffect } from 'react'
 import Router from 'next/router'
-import { useObjectStorages } from 'lib/resource/object-storage'
+import { actionTypes } from 'lib/redux/resource'
+import { useGraphQLRequest } from 'lib/util/request'
+import { useSelector } from 'react-redux'
 
 const Component: React.FC = () => {
   const hrefNew = `/object-storages/new`
-  const [
-    objectStorages,
-    getObjectStorages,
-    loading,
-    error
-  ] = useObjectStorages()
+  const query = `
+  query{
+    objectStorages {
+      id
+      type
+      location
+      name
+      description
+      syncStatus
+    }
+  }
+  `
+  const objectStorages = useSelector(state => state.resource.objectStorages)
   const rows = objectStorages || []
+  const [funcFetchGraphQL, loading, errors] = useGraphQLRequest()
 
   useEffect(() => {
-    getObjectStorages()
+    const id = setInterval(() => {
+      funcFetchGraphQL(
+        query,
+        actionTypes.OBJECT_STORAGES_SUCCESS,
+        'objectStorages'
+      )
+    }, 4 * 1000)
+    return () => clearInterval(id)
   }, [])
-
-  console.log(`objectStorages: ${JSON.stringify(objectStorages)}`)
 
   return (
     <Grid container spacing={3}>

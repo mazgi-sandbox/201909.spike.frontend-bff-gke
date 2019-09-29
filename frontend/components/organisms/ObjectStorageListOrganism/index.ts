@@ -1,1 +1,1 @@
-export { default } from './ObjectStorageListOrganism'
+export { default } from './List'

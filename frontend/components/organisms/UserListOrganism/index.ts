@@ -1,1 +1,1 @@
-export { default } from './UserListOrganism'
+export { default } from './List'

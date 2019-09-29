@@ -1,15 +1,15 @@
 import { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { actionTypes } from 'lib/redux/resource'
-import faker from 'faker'
 import getConfig from 'next/config'
 
 const { publicRuntimeConfig } = getConfig()
 const endpoint = publicRuntimeConfig.BFF_ENDPOINT_GRAPHQL
+console.log(`endpoint: ${endpoint}`)
 
 const useCreateUser = () => {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [errors, setErrors] = useState([])
   const user = useSelector(state => state.resource.createUser)
   const dispatch = useDispatch()
   const funcPutUser = async ({ name, displayName, email, password }) => {
@@ -28,7 +28,6 @@ const useCreateUser = () => {
     }
     `
     console.log(`query: ${query}`)
-    console.log(`query(json): ${JSON.stringify(query)}`)
     const fetchOpts = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -37,26 +36,31 @@ const useCreateUser = () => {
 
     setLoading(true)
     try {
-      console.log(`endpoint: ${endpoint}`)
       const response = await fetch(endpoint, fetchOpts)
       console.log(`response.status: ${response.status}, ${response.statusText}`)
       const result = await response.json()
-      const data = result.data
-      const user = data.createUser
-      console.log(`createUser: ${JSON.stringify(user)}`)
+      console.log(`response:.json() ${JSON.stringify(result, null, 2)}`)
+      const errors = result.errors
+      if (errors) {
+        console.log(`errors: ${JSON.stringify(errors, null, 2)}`)
+        setErrors(errors)
+      } else {
+        const data = result.data
+        const user = data.createUser
+        dispatch({
+          type: actionTypes.CREATE_USER_SUCCESS,
+          createUser: user
+        })
+      }
       setLoading(false)
-      dispatch({
-        type: actionTypes.CREATE_USER_SUCCESS,
-        createUser: user
-      })
     } catch (e) {
-      console.log(`err: ${e}`)
+      console.log(`error: ${e}`)
       setLoading(false)
-      setError(e.message)
+      setErrors([e])
     }
   }
-  const putUser = useCallback(funcPutUser, [loading, error, user])
-  return [user, putUser, loading, error]
+  const putUser = useCallback(funcPutUser, [loading, errors, user])
+  return [user, putUser, loading, errors]
 }
 
 export default useCreateUser

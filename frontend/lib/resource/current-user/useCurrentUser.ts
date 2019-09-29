@@ -2,43 +2,46 @@ import { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { actionTypes } from 'lib/redux/resource'
 import getConfig from 'next/config'
+import { loadTokenFromCookie } from 'lib/util/cookie'
 
 const { publicRuntimeConfig } = getConfig()
 const endpoint = publicRuntimeConfig.BFF_ENDPOINT_GRAPHQL
 
-const useUsers = () => {
+const useCurrentUser = () => {
   const query = `
   query{
-    users {
+    currentUser {
       id
       name
       displayName
       email
+      token
     }
   }
   `
+  const token = loadTokenFromCookie()
   const fetchOpts = {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-AUTH-JWT': token },
     body: JSON.stringify({ query })
   }
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const users = useSelector(state => state.resource.users)
+  const currentUser = useSelector(state => state.resource.currentUser)
   const dispatch = useDispatch()
-  const funcGetUsers: () => void = async () => {
+  const funcGetCurrentUser: () => void = async () => {
     setLoading(true)
     try {
       console.log(`endpoint: ${endpoint}`)
       const response = await fetch(endpoint, fetchOpts)
       const result = await response.json()
       const data = result.data
-      const users = data.users
-      console.log(`users: ${JSON.stringify(users)}`)
+      const currentUser = data.currentUser
+      console.log(`currentUser: ${JSON.stringify(currentUser)}`)
       setLoading(false)
       dispatch({
-        type: actionTypes.USERS_SUCCESS,
-        users
+        type: actionTypes.CURRENT_USER_SUCCESS,
+        currentUser
       })
     } catch (e) {
       console.log(`err: ${e}`)
@@ -46,8 +49,12 @@ const useUsers = () => {
       setError(e.message)
     }
   }
-  const getUsers = useCallback(funcGetUsers, [loading, error, users])
-  return [users, getUsers, loading, error]
+  const getCurrentUser = useCallback(funcGetCurrentUser, [
+    loading,
+    error,
+    currentUser
+  ])
+  return [currentUser, getCurrentUser, loading, error]
 }
 
-export default useUsers
+export default useCurrentUser
