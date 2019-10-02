@@ -1,1 +1,1 @@
-export { default as useGraphQLRequest } from './useGraphQLRequest'
+export { default as useGraphQLRequest, sendLogs } from './useGraphQLRequest'

@@ -1,3 +1,7 @@
+import getConfig from 'next/config'
+const { publicRuntimeConfig } = getConfig()
+const isDev = publicRuntimeConfig.IS_DEVELOPMENT
+
 export const saveTokenToCookie: (token: string) => void = token => {
   if (process.browser) {
     const expires = new Date()
@@ -5,22 +9,28 @@ export const saveTokenToCookie: (token: string) => void = token => {
     const cookie = `token=${
       token ? token : ''
     }; expires=${expires.toUTCString()}; path=/`
-    console.log(`saving cookie: ${cookie}`)
+    console.log(`saving cookie.`)
     document.cookie = cookie
   }
 }
 
-export const loadTokenFromCookie: () => string | null = () => {
-  if (process.browser) {
+export const loadTokenFromCookie: () => string = () => {
+  const regex = /token=([^;]*);/
+  isDev && console.log(`start loading token from cookie.`)
+  const isBrowser = process.browser
+  // isDev && console.log(`isBrowser: ${isBrowser}`)
+  if (isBrowser) {
     const cookie = document.cookie
-    console.log(`loaded cookie: ${cookie}`)
+    isDev && console.log(`raw cookie: ${cookie}`)
     if (cookie) {
-      const values = cookie.split('; token=')
-      console.log(`loaded cookie values: ${JSON.stringify(values)}`)
-      if (values.length == 2) {
-        const value = values[1]
-        console.log(`loaded token: ${value}`)
-        return value
+      const match = `${cookie};`.match(regex)
+      // isDev && console.log(`match: ${JSON.stringify(match)}`)
+      if (match.length == 2) {
+        const token = match[1]
+        if (token) {
+          console.log(`loaded token from cookie: ${token}`)
+          return token
+        }
       }
     }
   }

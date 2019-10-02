@@ -1,6 +1,7 @@
 import { BaseEntity, createConnection, getConnectionOptions } from 'typeorm'
 import app from './app'
 import errorHandler from 'errorhandler'
+import { loadSeedData } from './init'
 
 // Express configuration
 app.set('port', process.env.PORT || 3000)
@@ -18,6 +19,9 @@ const server: () => void = async () => {
   const connectionOptions = await getConnectionOptions()
   const connection = await createConnection(connectionOptions)
   BaseEntity.useConnection(connection)
+
+  // Initialize DB
+  await loadSeedData()
 
   app.listen(app.get('port'), () => {
     console.log(

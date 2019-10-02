@@ -1,8 +1,8 @@
 import * as fs from 'fs'
 import { GCPProject, ObjectStorage, User, VirtualMachine } from 'src/entities'
+import { authenticateLocal, authenticatedUser } from 'src/lib/aaa'
 import Compute from '@google-cloud/compute'
 import { Storage } from '@google-cloud/storage'
-import { authenticateLocal, authenticated } from 'src/aaa'
 
 const isDev = 'development' == process.env.NODE_ENV
 
@@ -15,38 +15,39 @@ const credentials = JSON.parse(rawCredential)
 const root: {
   [key: string]: any
 } = {
-  signInLocal: async ({ email, password }, request) => {
-    if (isDev) {
-      console.log(`signIn: email => ${email}, password => ${password}`)
-    }
-
-    const [user, error] = await authenticateLocal(email, password)
-    if (error) {
-      throw error
-    }
-    return user
-  },
-  currentUser: async (args, request) => {
-    const token = request.headers['x-auth-jwt']
+  log: ({ message }, request: Request) => {
     if (isDev) {
       console.log(
-        `request.headers: ${JSON.stringify(request.headers, null, 2)}`
+        `<<<💻💻💻 FROM CLIENT 💻💻💻>>>\n` +
+          `host => ${request.headers['host']},\n` +
+          `message => ${JSON.stringify(message, null, 2)}`
       )
-      console.log(`currentUser: token => ${token}`)
     }
-    const [user, error] = await authenticated(token)
-    if (error) {
-      throw error
-    }
-    return user
   },
 
-  users: async (args, request) => {
+  signInLocal: async ({ email, password }, request) => {
+    const user = await authenticateLocal(email, password)
+    return user
+  },
+  currentUser: async (args, request: Request) => {
+    const currentUser = await authenticatedUser(request)
+    return currentUser
+  },
+
+  users: async (args, request: Request) => {
+    await authenticatedUser(request)
+    //TODO: query
     const users = await User.find()
     console.log(`users: ${JSON.stringify(users)}`)
     return users
   },
-  createUser: async ({ name, displayName, email }, request) => {
+  createUser: async ({ name, displayName, email }, request: Request) => {
+    const currentUser = await authenticatedUser(request)
+    //TODO: validate user permissions
+    // const groups = currentUser.groups
+    // const permissions = merge(groups.permissions, currentUser.permissions)
+    // const permit = permissions.can(`createUser`)
+
     console.log(
       `createUser: name: ${name}, displayName: ${displayName}, email: ${email}`
     )
@@ -57,14 +58,6 @@ const root: {
     user.email = email
     await user.save()
     return user
-  },
-
-  hello: (args, request) => {
-    console.log(`hello`)
-    console.log(`args: ${JSON.stringify(args)}`)
-    console.log(`request.ip: ${request.ip}`)
-    console.log(`request.user: ${JSON.stringify(request.body, null, 2)}`)
-    return 'Hello world!'
   },
 
   gcpProjects: async (args, request) => {
@@ -173,6 +166,17 @@ const root: {
     //TODO: validation
     await virtualMachine.save()
     return virtualMachine
+  },
+
+  hello: (args, request, response) => {
+    console.log(JSON.stringify(request.headers, null, 2))
+    const hello = `hello`
+    // const world = `world`
+    const e = new Error(`Cannot found your world :(`)
+    return [hello, e]
+  },
+  alwaysError: (args, request) => {
+    throw new Error(`always error`)
   }
 }
 

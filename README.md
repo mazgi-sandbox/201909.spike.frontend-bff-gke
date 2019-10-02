@@ -27,6 +27,13 @@ UID=1000
 GID=100
 ```
 
+### Generate the key pair for JWT
+
+```shellsession
+openssl genrsa -out credentials/jwt.key.pem 4096
+openssl rsa -in credentials/jwt.key.pem -pubout -out credentials/jwt.pubkey.pem
+```
+
 ## Before deploy
 
 ### Setup your GCP Project
@@ -76,6 +83,12 @@ export FRONTEND_STATIC_ADDRESS_NAME="${PROJECT_BASENAME}-frontend-main"
 # BFF
 export BFF_FQDN="bff.${PROJECT_BASENAME}.${PROJECT_BASEDOMAIN}"
 export BFF_STATIC_ADDRESS_NAME="${PROJECT_BASENAME}-bff-main"
+export BFF_EMAIL_SENDER_EMAIL="YOUR-SENDER-EMAIL-ADDRESS"
+export BFF_EMAIL_SENDER_PASSWORD="YOUR-SENDER-EMAIL-PASSWORD"
+export BFF_ADMIN_EMAIL="YOUR-ADMIN-EMAIL"
+export BFF_ADMIN_PASSWORD_PLAINTEXT="YOUR-ADMIN-PASSWORD"
+export BFF_OAUTH_GITHUB_CLIENT_ID="YOUR-GITHUB-CLIENT-ID"
+export BFF_OAUTH_GITHUB_CLIENT_SECRET="YOUR-GITHUB-CLIENT-SECRET"
 
 # GCP
 export CLOUDSDK_CORE_PROJECT='YOUR-GCP-PROJECT'

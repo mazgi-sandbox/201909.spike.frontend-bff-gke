@@ -89,7 +89,7 @@ const Component: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     const id = setInterval(() => {
       funcFetchGraphQL(query, actionTypes.CURRENT_USER_SUCCESS, 'currentUser')
-    }, 16 * 1000)
+    }, 60 * 1000)
     return () => clearInterval(id)
   }, [])
 

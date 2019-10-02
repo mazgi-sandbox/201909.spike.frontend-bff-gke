@@ -1,4 +1,4 @@
-import { saveTokenToCookie } from '../../util/cookie'
+import { loadTokenFromCookie, saveTokenToCookie } from 'lib/util/cookie'
 
 export const actionTypes = {
   SIGN_IN_SUCCESS: 'RESOURCE/SIGN_IN_SUCCESS',
@@ -14,7 +14,7 @@ export const actionTypes = {
 }
 
 const defaultInitialState = {
-  users: []
+  token: loadTokenFromCookie()
 }
 
 export const reducer = (state = defaultInitialState, action) => {
@@ -22,21 +22,21 @@ export const reducer = (state = defaultInitialState, action) => {
     case actionTypes.SIGN_IN_SUCCESS: {
       const currentUser = action.signInLocal
       const token = currentUser ? currentUser.token : null
-      console.log(`SIGN_IN_SUCCESS: ${action.type}`)
       saveTokenToCookie(token)
       return {
         ...state,
-        currentUser
+        currentUser,
+        token
       }
     }
     case actionTypes.CURRENT_USER_SUCCESS: {
       const currentUser = action.currentUser
       const token = currentUser ? currentUser.token : null
-      console.log(`CURRENT_USER_SUCCESS: ${action.type}`)
       saveTokenToCookie(token)
       return {
         ...state,
-        currentUser
+        currentUser,
+        token
       }
     }
     case actionTypes.GCP_PROJECTS_SUCCESS:

@@ -1,14 +1,14 @@
-import { Button, Grid, Paper, TextField } from '@material-ui/core'
-import React from 'react'
+import { Button, Grid, Paper, TextField, makeStyles } from '@material-ui/core'
+import React, { useEffect } from 'react'
 import Router from 'next/router'
+import { actionTypes } from 'lib/redux/resource'
 import faker from 'faker'
 import { generateMessage } from 'components/molecules/SnackbarMolecules'
 import getConfig from 'next/config'
-import { makeStyles } from '@material-ui/core'
 import { notificationEnqueueMessage } from 'lib/redux/ui'
-import { useCreateUser } from 'lib/resource/user'
 import { useDispatch } from 'react-redux'
 import useForm from 'react-hook-form'
+import { useGraphQLRequest } from 'lib/util/request'
 
 const { publicRuntimeConfig } = getConfig()
 const isDev = publicRuntimeConfig.IS_DEVELOPMENT
@@ -27,21 +27,28 @@ const Component = () => {
   const hrefList = `/users`
   const classes = useStyles('')
   const { register, handleSubmit, watch, errors: formErrors } = useForm()
-  const [user, putUser, loading, remoteErrors] = useCreateUser()
+  const [funcFetchGraphQL, loading, fetchErrors] = useGraphQLRequest()
   const onSubmit = data => {
     console.log(`create a user: ${JSON.stringify(data, null, 2)}`)
-    putUser(data)
-    if (remoteErrors && remoteErrors.length > 0) {
-      console.log(`remoteErrors: ${JSON.stringify(remoteErrors, null, 2)}`)
-      remoteErrors.map(e => {
-        const message = generateMessage(`${e.message}`)
-        dispatch(notificationEnqueueMessage(message))
-      })
-    } else {
-      const message = generateMessage(`User was registered.`)
-      dispatch(notificationEnqueueMessage(message))
-      Router.push(hrefList)
+    const query = `
+    mutation{
+      createUser(
+        name: "${data.name}",
+        displayName: "${data.displayName}",
+        email: "${data.email}"
+      ) {
+        id
+        name
+        displayName
+        email
+      }
     }
+    `
+    funcFetchGraphQL(
+      query,
+      actionTypes.REGISTER_GCP_PROJECT_SUCCESS,
+      'createUser'
+    )
   }
 
   return (

@@ -19,16 +19,19 @@ module.exports = phase => {
     publicRuntimeConfig: {
       // Will be available on both server and client
       IS_DEVELOPMENT: isDev,
-      BFF_ENDPOINT_GRAPHQL: process.env.BFF_ENDPOINT_GRAPHQL,
+      BFF_ENDPOINT_GRAPHQL: process.env.BFF_ENDPOINT_GRAPHQL
     },
     serverRuntimeConfig: {
       // Will only be available on the server side
     },
     webpack: (webpackConfig, options) => {
-      webpackConfig.resolve.alias['components'] = path.join(__dirname, 'components')
+      webpackConfig.resolve.alias['components'] = path.join(
+        __dirname,
+        'components'
+      )
       webpackConfig.resolve.alias['lib'] = path.join(__dirname, 'lib')
       return webpackConfig
-    },
+    }
   }
 
   // next.config.js object

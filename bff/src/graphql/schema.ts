@@ -37,14 +37,19 @@ type User {
 
 type Query {
   currentUser: User,
-  hello: String,
   gcpProjects: [GCPProject],
   objectStorages: [ObjectStorage],
   virtualMachines: [VirtualMachine],
   users: [User],
+  hello: [String],
+  alwaysError: Boolean,
 },
 
 type Mutation {
+  log(
+    message: String,
+  ): Boolean,
+
   signInLocal(
     email: String!,
     password: String,

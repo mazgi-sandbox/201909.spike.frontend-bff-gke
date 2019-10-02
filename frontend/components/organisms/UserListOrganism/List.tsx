@@ -34,7 +34,7 @@ const Component: React.FC = () => {
   useEffect(() => {
     const id = setInterval(() => {
       funcFetchGraphQL(query, actionTypes.USERS_SUCCESS, 'users')
-    }, 4 * 1000)
+    }, 60 * 60 * 1000)
     return () => clearInterval(id)
   }, [])
   const [selected, setSelected] = useState([])

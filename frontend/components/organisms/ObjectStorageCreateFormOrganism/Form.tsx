@@ -6,10 +6,14 @@ import {
   Theme,
   makeStyles
 } from '@material-ui/core'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { actionTypes } from 'lib/redux/resource'
 import faker from 'faker'
-import { useCreateObjectStorage } from 'lib/resource/object-storage'
+import { generateMessage } from 'components/molecules/SnackbarMolecules'
+import { notificationEnqueueMessage } from 'lib/redux/ui'
+import { useDispatch } from 'react-redux'
 import useForm from 'react-hook-form'
+import { useGraphQLRequest } from 'lib/util/request'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -21,17 +25,39 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 const Component = () => {
+  const dispatch = useDispatch()
   const classes = useStyles('')
   const { register, handleSubmit, watch, errors } = useForm()
-  const [
-    objectStorage,
-    putObjectStorage,
-    loading,
-    error
-  ] = useCreateObjectStorage()
+  const [funcFetchGraphQL, loading, fetchErrors] = useGraphQLRequest()
+  useEffect(() => {
+    fetchErrors.forEach(err => {
+      const message = generateMessage(err.message)
+      dispatch(notificationEnqueueMessage(message))
+    })
+  }, fetchErrors)
   const onSubmit = data => {
     console.log(`create a object storage: ${JSON.stringify(data)}`)
-    putObjectStorage(data)
+    const query = `
+    mutation{
+      createObjectStorage(
+        type: "${data.type}",
+        location: "${data.location}",
+        name: "${data.name}",
+        description: "${data.description}"
+      ) {
+        id
+        type
+        location
+        name
+        description
+      }
+    }
+    `
+    funcFetchGraphQL(
+      query,
+      actionTypes.REGISTER_GCP_PROJECT_SUCCESS,
+      'createObjectStorage'
+    )
   }
 
   return (
